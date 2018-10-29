@@ -1,0 +1,182 @@
+<% include ../partials/header %>
+
+<div class="container">
+    <div style="margin-top: 5.0em">
+        <div class="row">
+            <div class="col-md-3">
+                <div class="thumbnail">
+                    <img src="<%= guide.image %>">
+                </div>
+                <address>
+                  <strong><h3 class="lead"><%= guide.name %></h3></strong><br>
+                  <abbr title="Adress">A: </abbr><%= guide.adress %><br>
+                </address>
+                <div style="margin-top: 10px;">
+                     <a class="btn btn-lg btn-default" href="/guide"><i class="fa fa-arrow-left"></i> Go back</a>
+                </div>
+            </div>
+            <div class="col-md-9">
+            <div class="ui main container segment">
+                <div class="description">
+                    <div >
+                        <strong class="enter"><%= guide.dsc %></strong>
+                    </div>
+                </div>
+                <br>
+                <p>
+                    <em>Submitted by: <%= guide.author.username %>, <%= moment(guide.createdAt).fromNow() %></em>
+                </p>
+                <% if(currentUser && guide.author.id.equals(currentUser._id) || currentUser && currentUser.isAdmin){ %>
+                    <a class="ui inverted purple button" href="/guide/<%= guide._id%>/edit">Update</a>
+                    <form id="delete-form" action="/guide/<%= guide._id %>?_method=DELETE" method="POST">
+                        <button class="ui inverted red button">Delete</button>
+                    </form>
+                <% } %>
+            </div>
+                
+        <div class="thumbnail">
+            <div class="caption-full">
+                <% if (guide.rating === 0) { %>
+                <h5>
+                    <em>No reviews yet.</em>
+                </h5>
+                <% } else { %>
+                <p>
+                    <span class="fa fa-star checked"></span>
+                    <span class="fa fa-star <% if (guide.rating > 1.5) { %> checked <% } %>"></span>
+                    <span class="fa fa-star <% if (guide.rating > 2.5) { %> checked <% } %>"></span>
+                    <span class="fa fa-star <% if (guide.rating > 3.5) { %> checked <% } %>"></span>
+                    <span class="fa fa-star <% if (guide.rating > 4.5) { %> checked <% } %>"></span>
+                    <em>(total reviews: <%= guide.reviews.length %>)</em>
+                </p>
+                <p>
+                    Current place rating: <strong><%= guide.rating.toFixed(2) %></strong>
+                </p>
+                <p>
+                    <h4>Latest reviews for this place:</h4>
+                </p>
+                <hr style="margin-top: 0;">
+                <% guide.reviews.slice(0, 5).forEach(function(review){ %>
+                <div class="row">
+                    <div class="col-md-3">
+                        <%- '<span class="fa fa-star checked"></span>'.repeat(review.rating) %><%- '<span class="fa fa-star"></span>'.repeat(5 - review.rating) %>
+                        <div>Review by: <strong><%= review.author.username %></strong></div>
+                        <span><em><%= review.updatedAt.toDateString() %></em></span>
+                    </div>
+                    <div class="col-md-9">
+                        <p class="enter" style="text-align: center; word-wrap: break-word;">
+                            <%= review.text %>
+                        </p>
+                        <% if(currentUser && review.author.id.equals(currentUser._id) || currentUser && currentUser.isAdmin){ %>
+                        <a class="btn btn-xs btn-warning"
+                              href="/guide/<%=guide._id %>/reviews/<%=review._id %>/edit">Edit</a>
+                        <form id="delete-form" action="/guide/<%=guide._id %>/reviews/<%=review._id %>?_method=DELETE" method="POST">
+                               <input type="submit" class="btn btn-xs btn-danger" value="Delete">
+                        </form>
+                        <% } %>
+                    </div>
+                </div>
+                <hr>
+                <% }); %>
+                <div style="margin-bottom: 10px;">
+                    <h4><a href="/guide/<%= guide._id %>/reviews"><i class="fa fa-search" aria-hidden="true"></i> See all reviews</a></h4>
+                </div>
+                <% } %>
+                <div>
+                    <a class="btn btn-primary btn-lg <% if (currentUser && guide.reviews.some(function (review) {return review.author.id.equals(currentUser._id)})) { %> disabled <% } %>" href="/guide/<%= guide._id %>/reviews/new">
+                        Write a New Review</a>
+                </div>
+            </div>
+        </div>
+                
+                
+<!--start comment-->
+<div class="well">
+    <div class="text-right">
+        <a class="btn btn-success pull-right" role="button" data-toggle="collapse" href="#collapseComment" aria-expanded="false" aria-controls="collapseComment">
+            <span class="glyphicon glyphicon-plus" aria-hidden="true"></span> Add new comment</a>
+    </div>
+    <h4>
+        <strong>Comments <span class="glyphicon glyphicon glyphicon-comment" aria-hidden="true"></span></strong>
+    </h4>
+    <div class="collapse" id="collapseComment">
+        <div class="well" style="border-left: 5px solid #00C851;">
+            <% if(!currentUser) { %>
+                <h5>You need to login before you can comment. <a href="/login">Click here</a> to go to the login page.</h5>
+            <% } %>
+            <% if(currentUser) { %>
+                <h4>Write your comment <span class="glyphicon glyphicon glyphicon-pencil" aria-hidden="true"></span></h4>
+                <form id="add-comment-form" action="/guide/<%= guide._id %>/comment" method="POST">
+                    <div class="form-group">
+                        <input class="form-control" type="text" disabled value="<%= currentUser.username %>">
+                    </div>
+                    <div class="form-group">
+                        <textarea class="form-control" name="comment[text]" placeholder="Write your comment..." form="add-comment-form" rows="5" cols="70"></textarea>
+                    </div>
+                    <div class="form-group">
+                        <button class="btn btn-success btn-sm">Comment <span class="glyphicon glyphicon-comment" aria-hidden="true"></span></button>
+                    </div>
+                </form>
+            <% } %>
+        </div>
+    </div>
+                
+<hr>
+
+<% if (guide.comments.length === 0) { %>
+    <em style="color: grey;">No comments yet.</em>
+<% } %>
+<% guide.comments.forEach(function(comment) { %>
+    <div class="row">
+        <div class="col-md-12">
+            <strong>
+                <% if (currentUser && currentUser._id.equals(comment.author.id)) { %>
+                    <span style="color: orange;" class="glyphicon glyphicon-user" aria-hidden="true"></span>
+                <% } else { %>
+                    <span class="glyphicon glyphicon-user" aria-hidden="true"></span>
+                <% } %>
+                <%= comment.author.username %>
+            </strong>
+    
+    <span class="pull-right"><%= moment(comment.createdAt).fromNow() %></span>
+    <p class="enter"><%= comment.text %></p>
+    <% if (currentUser && currentUser._id.equals(comment.author.id) || currentUser && currentUser.isAdmin) { %>
+        <a class="btn btn-xs btn-warning" role="button" data-toggle="collapse" href="#collapseEdit<%= comment._id %>" aria-expanded="false" aria-controls="collapse<%= comment._id %>">
+            Edit
+        </a>
+    
+    <form id="delete-form" action="/guide/<%= guide._id %>/comment/<%= comment._id %>?_method=DELETE" method="POST" style="display: inline;">
+        <button class="btn btn-xs btn-danger">Delete</button>
+     </form>
+    
+    <div class="collapse" id="collapseEdit<%= comment._id %>">
+        <div class="well" style="border-left: 5px solid #ffbb33; margin-top: 15px;">
+            <h4>Edit your comment <span class="glyphicon glyphicon-edit" aria-hidden="true"></span></h4>
+            <form id="edit-comment-form<%= comment._id %>" action="/guide/<%= guide._id %>/comment/<%= comment._id %>?_method=PUT" method="POST">
+                <div class="form-group">
+                    <input class="form-control" type="text" disabled value="<%= currentUser.username %>">
+                </div>
+                <div class="form-group">
+                    <textarea class="form-control" name="comment[text]" placeholder="Your comment text..." form="edit-comment-form<%= comment._id %>" rows="5" cols="70"><%= comment.text %></textarea>
+                </div>
+                <div class="form-group">
+                    <button class="btn btn-warning btn-sm">Edit comment <span class="glyphicon glyphicon-comment" aria-hidden="true"></span></button>
+                </div>
+          </form>
+        </div>
+    </div>
+    <% } %>
+    <hr>
+    </div>
+    </div>
+    <% }) %>
+</div>
+
+                
+                
+            </div>
+        </div>
+    </div>
+</div>
+
+<% include ../partials/footer %>

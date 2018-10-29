@@ -1,0 +1,17 @@
+#landing-header {
+    text-align: center;
+    padding-top: 45vh;
+}
+
+#landing-header h1 {
+    color: #fff
+}
+
+.image{
+    top: 0;
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    background-size: cover;
+    background-image: url(https://lonelyplanetimages.imgix.net/mastheads/GettyImages-538096543_medium.jpg?sharp=10&vib=20&w=1200)
+}

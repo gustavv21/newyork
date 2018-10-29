@@ -1,0 +1,35 @@
+<% include ../partials/header %>
+
+<div class="ui main text container">
+    <div class="ui huge header row text-center">Places you must visit while in New York</div>
+    <hr>
+</div>
+    <div class="container">
+        <% guides.forEach(function(guide){ %>
+            <div class="col-md-6 col-sm-12">
+                <div class="thumbnail" >
+                    <img style="height:350px;" src="<%= guide.image %>">
+                <div class="content">
+                    <a class="header" href="/guide/<%= guide._id %>"><%= guide.name %> <%= guide.surname %></a>
+                    <div class="meta">
+                        <span><%= guide.created.toDateString() %></span>
+                    </div>
+                    <% if (guide.rating === 0) { %>
+                        <em>No reviews yet.</em>
+                        <% } else { %>
+                            <span class="fa fa-star checked"></span>
+                            <span class="fa fa-star <% if (guide.rating > 1.5) { %> checked <% } %>"></span>
+                            <span class="fa fa-star <% if (guide.rating > 2.5) { %> checked <% } %>"></span>
+                            <span class="fa fa-star <% if (guide.rating > 3.5) { %> checked <% } %>"></span>
+                            <span class="fa fa-star <% if (guide.rating > 4.5) { %> checked <% } %>"></span>
+                        <% } %>
+                        <div class="extra">
+                            <a class="ui inverted purple button" href="/guide/<%= guide._id %>">Check the place!
+                            <i class="right chevron icon"></i>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        <% }); %>
+    </div>
