@@ -19,6 +19,8 @@ var guideRoutes   = require("./routes/guide"),
 
 
 mongoose.connect("mongodb://localhost/guide_list");
+mongoose.connect("mongodb://gustav:Gustav1@ds145053.mlab.com:45053/newyork");
+// mongodb://<dbuser>:<dbpassword>@ds145053.mlab.com:45053/newyork
 app.use(bodyParser.urlencoded({extended: true}));
 app.set("view engine", "ejs");
 app.use(express.static(__dirname + '/public'));
